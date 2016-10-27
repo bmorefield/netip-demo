@@ -2,18 +2,26 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>System Info</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
+    <h1>System Info</h1>
     <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using node <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
+    <p>Your External IP: <span id="externalip"></span>
   </body>
 
   <script>
     // You can also require other files to run in this process
     require('./renderer.js')
+
+      // Get the external IP address and display to user
+  var http = require('http');
+
+  http.get({'host': 'api.ipify.org', 'port': 80, 'path': '/'}, function(resp) {
+    resp.on('data', function(ip) {
+      document.getElementById("externalip").innerHTML = ip;
+    });
+  });
+
   </script>
 </html>
