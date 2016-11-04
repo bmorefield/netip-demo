@@ -7,6 +7,7 @@
   <body>
     <h1>System Info</h1>
     <!-- All of the Node.js APIs are available in this renderer process. -->
+    <p>Local IP Addresses: <span id="localip"></span></p>
     <p>
       Your External IP: <span id="externalip"></span> (<span id="reversedns"></span>)
     </p>
@@ -16,8 +17,24 @@
     // You can also require other files to run in this process
     require('./renderer.js')
 
+    // Get the local IP addresses and display to user
+    var os = require('os');
+
+    var interfaces = os.networkInterfaces();
+    var addresses = [];
+    for (var k in interfaces) {
+        for (var k2 in interfaces[k]) {
+            var address = interfaces[k][k2];
+            if (address.family === 'IPv4' && !address.internal) {
+                addresses.push(address.address);
+            }
+        }
+    }
+    document.getElementById("localip").innerHTML = addresses;
+
     // Get the external IP address and display to user
     var http = require('http');
+    var dns = require('dns');
 
     http.get({'host': 'api.ipify.org', 'port': 80, 'path': '/'}, function(resp) {
       resp.on('data', function(ip) {
@@ -25,7 +42,6 @@
         console.log(parsedIp);
         document.getElementById("externalip").innerHTML = parsedIp;
 
-        var dns = require('dns');
         dns.reverse(parsedIp, function(err, hostnames) {
           document.getElementById("reversedns").innerHTML = hostnames;
         });
