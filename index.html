@@ -16,21 +16,21 @@
     // You can also require other files to run in this process
     require('./renderer.js')
 
-      // Get the external IP address and display to user
-  var http = require('http');
+    // Get the external IP address and display to user
+    var http = require('http');
 
-  http.get({'host': 'api.ipify.org', 'port': 80, 'path': '/'}, function(resp) {
-    resp.on('data', function(ip) {
-      var parsedIp = String(ip);
-      console.log(parsedIp);
-      document.getElementById("externalip").innerHTML = parsedIp;
+    http.get({'host': 'api.ipify.org', 'port': 80, 'path': '/'}, function(resp) {
+      resp.on('data', function(ip) {
+        var parsedIp = String(ip);
+        console.log(parsedIp);
+        document.getElementById("externalip").innerHTML = parsedIp;
 
-      var dns = require('dns');
-      dns.reverse(parsedIp, function(err, hostnames) {
-        document.getElementById("reversedns").innerHTML = hostnames;
+        var dns = require('dns');
+        dns.reverse(parsedIp, function(err, hostnames) {
+          document.getElementById("reversedns").innerHTML = hostnames;
+        });
       });
     });
-  });
 
   </script>
 </html>
