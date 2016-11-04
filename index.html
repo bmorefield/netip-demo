@@ -7,7 +7,9 @@
   <body>
     <h1>System Info</h1>
     <!-- All of the Node.js APIs are available in this renderer process. -->
-    <p>Your External IP: <span id="externalip"></span>
+    <p>
+      Your External IP: <span id="externalip"></span> (<span id="reversedns"></span>)
+    </p>
   </body>
 
   <script>
@@ -19,7 +21,14 @@
 
   http.get({'host': 'api.ipify.org', 'port': 80, 'path': '/'}, function(resp) {
     resp.on('data', function(ip) {
-      document.getElementById("externalip").innerHTML = ip;
+      var parsedIp = String(ip);
+      console.log(parsedIp);
+      document.getElementById("externalip").innerHTML = parsedIp;
+
+      var dns = require('dns');
+      dns.reverse(parsedIp, function(err, hostnames) {
+        document.getElementById("reversedns").innerHTML = hostnames;
+      });
     });
   });
 
