@@ -10,11 +10,19 @@ ipc.on('localIp', (evnt, ipInfo) => {
   var ipHtml = "<ol>";
   for (var idx = 0; idx < ipInfo.length; idx++) {
     var ip = ipInfo[idx];
-    ipHtml += "<li>" + ip.ip + " (" + ip.netmask + ")</li>";
+    ipHtml += "<li id=\"localip-" + idx + "\">" + ip.ip + "/" + ip.netmask + "</li>";
   }
   ipHtml += "</ol>";
 
   document.getElementById("localip").innerHTML = ipHtml;
+})
+
+ipc.on('localIpAndHost', (evnt, ipInfo) => {
+  console.log("Received Local IP with Host:" + ipInfo);
+  ipHtml = String(ipInfo.ip) + "/" + ipInfo.netmask + "(" + ipInfo.hostname + ")";
+
+  var listElementId = "localip" + ipInfo.id;
+  document.getElementById(listElementId).innerHTML = ipHtml;
 })
 
 ipc.on('remoteIp', (evnt, ipInfo) => {

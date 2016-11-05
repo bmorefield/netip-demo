@@ -61,24 +61,47 @@ function loadInformation () {
 
   var interfaces = os.networkInterfaces();
   var addresses = [];
+  var idx = 1;
   for (var k in interfaces) {
       for (var k2 in interfaces[k]) {
           var address = interfaces[k][k2];
           if (!address.internal) {
               var addressInfo = {
+                id: idx,
                 ip: String(address.address),
                 netmask: String(address.netmask)
               };
               addresses.push(addressInfo);
+              idx++;
           }
       }
   }
-  console.log("Local IP: " + addresses);
+  console.log("Local IP: " + JSON.stringify(addresses));
   mainWindow.webContents.send('localIp', addresses)
+
+  // Get the address info with host names
+  var dns = require('dns');
+  for(var idx = 0; idx < addresses.length; idx++) {
+    var ip = addresses[idx];
+    dns.reverse(String(ip.ip), function(err, hostnames) {
+      if(!err) {
+        console.log("Local Hostname for " + ip.address + ": " + hostnames)
+        var addressInfo = {
+          id: address.idx,
+          ip: String(address.address),
+          netmask: String(address.netmask),
+          hostname: String(hostnames)
+        };
+          mainWindow.webContents.send('localIpAndHost', addressInfo);
+      }
+      else {
+        console.log("Err reverse DNS for " + ip.ip + ": " + JSON.stringify(err));
+      }
+    });
+  }
 
   // Get the external IP address and display to user
   var http = require('http');
-  var dns = require('dns');
 
   http.get({'host': 'api.ipify.org', 'port': 80, 'path': '/'}, function(resp) {
     resp.on('data', function(ip) {
