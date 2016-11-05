@@ -64,8 +64,12 @@ function loadInformation () {
   for (var k in interfaces) {
       for (var k2 in interfaces[k]) {
           var address = interfaces[k][k2];
-          if (address.family === 'IPv4' && !address.internal) {
-              addresses.push(address.address);
+          if (!address.internal) {
+              var addressInfo = {
+                ip: String(address.address),
+                netmask: String(address.netmask)
+              };
+              addresses.push(addressInfo);
           }
       }
   }
