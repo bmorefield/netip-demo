@@ -7,10 +7,10 @@ const ipc = electron.ipcRenderer
 
 ipc.on('localIp', (evnt, ipInfo) => {
   console.log("Received Local IP:" + ipInfo);
-  var ipHtml = "<ol>";
+  var ipHtml = "<ol class=\"localipaddress\">";
   for (var idx = 0; idx < ipInfo.length; idx++) {
     var ip = ipInfo[idx];
-    ipHtml += "<li id=\"localip-" + idx + "\">" + ip.ip + "/" + ip.netmask + "</li>";
+    ipHtml += "<li id=\"localip-" + idx + "\">" + ip.ip + " / <span class=\"localnetmask\">" + ip.netmask + "</span></li>";
   }
   ipHtml += "</ol>";
 
@@ -19,8 +19,7 @@ ipc.on('localIp', (evnt, ipInfo) => {
 
 ipc.on('localIpAndHost', (evnt, ipInfo) => {
   console.log("Received Local IP with Host:" + ipInfo);
-  ipHtml = String(ipInfo.ip) + "/" + ipInfo.netmask + "(" + ipInfo.hostname + ")";
-
+  var ipHtml = String(ipInfo.ip) + " / <span class=\"localnetmask\">" + ip.netmask + "</span> (" + ipInfo.hostname + ")";
   var listElementId = "localip" + ipInfo.id;
   document.getElementById(listElementId).innerHTML = ipHtml;
 })
@@ -37,7 +36,7 @@ ipc.on('remoteHost', (evnt, hostInfo) => {
 
 ipc.on('dnsServers', (evnt, dnsInfo) => {
   console.log("DNS Servers: " + dnsInfo);
-  var dnsHtml = "<ol>";
+  var dnsHtml = "<ol class=\"dns-list\">";
   for(var idx = 0; idx < dnsInfo.length; idx++) {
     var dnsServer = dnsInfo[idx];
     dnsHtml += "<li>" + dnsServer + "</li>";

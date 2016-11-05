@@ -1,0 +1,18 @@
+h1 {
+  color: black;
+  text-decoration: underline;
+}
+
+.localipaddress {
+  color: black;
+}
+
+.localnetmask {
+  color: darkgray;
+}
+
+ol {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
