@@ -79,8 +79,12 @@ function loadInformation () {
   console.log("Local IP: " + JSON.stringify(addresses));
   mainWindow.webContents.send('localIp', addresses)
 
-  // Get the address info with host names
+  // Get the DNS Servers
   var dns = require('dns');
+  var dnsServers = dns.getServers();
+  mainWindow.webContents.send('dnsServers', dnsServers);
+
+  // Get the address info with host names
   for(var idx = 0; idx < addresses.length; idx++) {
     var ip = addresses[idx];
     dns.reverse(String(ip.ip), function(err, hostnames) {
@@ -92,10 +96,10 @@ function loadInformation () {
           netmask: String(address.netmask),
           hostname: String(hostnames)
         };
-          mainWindow.webContents.send('localIpAndHost', addressInfo);
+        mainWindow.webContents.send('localIpAndHost', addressInfo);
       }
       else {
-        console.log("Err reverse DNS for " + ip.ip + ": " + JSON.stringify(err));
+        console.log("Error on reverse DNS for " + ip.ip + ": " + JSON.stringify(err));
       }
     });
   }

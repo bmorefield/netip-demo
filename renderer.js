@@ -35,4 +35,15 @@ ipc.on('remoteHost', (evnt, hostInfo) => {
   document.getElementById("reversedns").innerHTML = hostInfo;
 })
 
+ipc.on('dnsServers', (evnt, dnsInfo) => {
+  console.log("DNS Servers: " + dnsInfo);
+  var dnsHtml = "<ol>";
+  for(var idx = 0; idx < dnsInfo.length; idx++) {
+    var dnsServer = dnsInfo[idx];
+    dnsHtml += "<li>" + dnsServer + "</li>";
+  }
+  dnsHtml += "</ol>";
+  document.getElementById("dns").innerHTML = dnsHtml;
+})
+
 ipc.send('load-info');
