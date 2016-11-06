@@ -15,7 +15,18 @@ let tray
 let localIp
 
 function createTray() {
-  tray = new Tray('iconmonstr-networking@2x.png')
+  var platform = require('os').platform()
+  var trayImage
+
+  if (platform == 'win32') {
+    trayImage = 'iconmonstr-networking.ico';
+  }
+  else /*(platform == 'darwin') */ {
+    trayImage = 'iconmonstr-networking.png';
+  }
+
+
+  tray = new Tray(trayImage)
 
   // Set click event
   tray.on('click', () => {
