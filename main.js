@@ -3,22 +3,63 @@ const electron = require('electron')
 const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
-// Module for IPC
+// Modules for IPC, Tray, and Menu
 const ipc = electron.ipcMain
+const Tray = electron.Tray
+const Menu = electron.Menu
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
+let tray
+let localIp
+
+function createTray() {
+  tray = new Tray('iconmonstr-networking@2x.png')
+
+  // Set click event
+  tray.on('click', () => {
+    if(mainWindow == null) {
+      createWindow()
+    }
+    else {
+      mainWindow.close()
+      mainWindow = null;
+    }
+  })
+
+  tray.on('right-click', () => {
+    var menuTemplate = [
+      {
+        label: 'Quit',
+        click: _ => app.quit()
+      }
+    ]
+    console.log("Tray: IP: " + localIp)
+    if(localIp) {
+      menuTemplate.splice(0, 0, {
+        label: localIp
+      })
+      menuTemplate.splice(1, 0, {
+        type: 'separator'
+      })
+    }
+    const menu = Menu.buildFromTemplate(menuTemplate)
+    tray.popUpContextMenu(menu)
+  })
+
+  getRemoteIp()
+}
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600})
+  mainWindow = new BrowserWindow({width: 400, height: 600})
 
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/index.html`)
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -37,7 +78,9 @@ ipc.on('load-info', _ => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', function () {
+  createTray()
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -56,7 +99,33 @@ app.on('activate', function () {
   }
 })
 
-function loadInformation () {
+function getRemoteIp() {
+  // Get the external IP address and display to user
+  var http = require('http');
+
+  http.get({'host': 'api.ipify.org', 'port': 80, 'path': '/'}, function(resp) {
+    resp.on('data', function(ip) {
+      var parsedIp = String(ip);
+      console.log("Remote IP: " + parsedIp);
+      tray.setToolTip(parsedIp)
+      localIp = parsedIp
+      if(mainWindow) {
+        mainWindow.webContents.send('remoteIp', parsedIp);
+      }
+
+      var dns = require('dns');
+      dns.reverse(parsedIp, function(err, hostnames) {
+        console.log("Remote Hostname: " + hostnames)
+        tray.setToolTip(parsedIp + " (" + hostnames + ")")
+        if(mainWindow) {
+          mainWindow.webContents.send('remoteHost', hostnames);
+        }
+      });
+    });
+  });
+}
+
+function getLocalIp () {
   var os = require('os');
 
   var interfaces = os.networkInterfaces();
@@ -103,22 +172,11 @@ function loadInformation () {
       }
     });
   }
+}
 
-  // Get the external IP address and display to user
-  var http = require('http');
-
-  http.get({'host': 'api.ipify.org', 'port': 80, 'path': '/'}, function(resp) {
-    resp.on('data', function(ip) {
-      var parsedIp = String(ip);
-      console.log("Remote IP: " + parsedIp);
-      mainWindow.webContents.send('remoteIp', parsedIp);
-
-      dns.reverse(parsedIp, function(err, hostnames) {
-        console.log("Remote Hostname: " + hostnames)
-        mainWindow.webContents.send('remoteHost', hostnames);
-      });
-    });
-  });
+function loadInformation () {
+  getLocalIp();
+  getRemoteIp();
 }
 
 // In this file you can include the rest of your app's specific main process
