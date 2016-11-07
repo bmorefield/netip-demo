@@ -7,6 +7,7 @@ const BrowserWindow = electron.BrowserWindow
 const ipc = electron.ipcMain
 const Tray = electron.Tray
 const Menu = electron.Menu
+const path = require('path')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -19,10 +20,10 @@ function createTray() {
   var trayImage
 
   if (platform == 'win32') {
-    trayImage = 'iconmonstr-networking.ico';
+    trayImage =  path.join(__dirname, 'iconmonstr-networking.ico');
   }
   else /*(platform == 'darwin') */ {
-    trayImage = 'iconmonstr-networking.png';
+    trayImage = path.join(__dirname, 'iconmonstr-networking.png');
   }
 
 
