@@ -1,7 +1,7 @@
 {
-  "name": "sysinfo",
+  "name": "NetIP",
   "version": "1.0.0",
-  "description": "A simple Electron application to show system information",
+  "description": "A simple Electron application to show IP address information.",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
