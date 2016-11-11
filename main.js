@@ -3,11 +3,12 @@ const electron = require('electron')
 const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
-// Modules for IPC, Tray, and Menu
+// Other modules
 const ipc = electron.ipcMain
 const Tray = electron.Tray
 const Menu = electron.Menu
 const path = require('path')
+var AutoLaunch = require('auto-launch');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -26,8 +27,23 @@ function createTray() {
     trayImage = path.join(__dirname, 'iconmonstr-networking.png');
   }
 
-
   tray = new Tray(trayImage)
+
+  // Autostart stuff
+  var netIpAutoLaunch = new AutoLaunch({
+    name: 'NetIP'
+  });
+  var autoStartEnabled;
+
+  netIpAutoLaunch.isEnabled()
+    .then(function(isEnabled) {
+      console.log("Autostart is " + isEnabled)
+      autoStartEnabled = isEnabled;
+    })
+    .catch(function(err){
+      console.log("Error getting autostart. Assuming no.");
+      autoStartEnabled = false;
+    });
 
   // Set click event
   tray.on('click', () => {
@@ -42,6 +58,25 @@ function createTray() {
 
   tray.on('right-click', () => {
     var menuTemplate = [
+      {
+        label: 'Run on Start',
+        type: 'checkbox',
+        checked: autoStartEnabled,
+        click: _ => {
+          if(autoStartEnabled) {
+            console.log("Disable clicked");
+            netIpAutoLaunch.disable();
+            autoStartEnabled = false;
+          } else {
+            console.log("Enable clicked");
+            netIpAutoLaunch.enable();
+            autoStartEnabled = true;
+          }
+        }
+      },
+      {
+        type: 'separator'
+      },
       {
         label: 'Quit',
         click: _ => app.quit()

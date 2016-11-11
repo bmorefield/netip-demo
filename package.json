@@ -9,6 +9,7 @@
   "author": "Bill Morefield",
   "license": "CC0-1.0",
   "devDependencies": {
+    "auto-launch": "^5.0.1",
     "electron": "^1.4.1"
   }
 }
