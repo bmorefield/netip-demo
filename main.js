@@ -16,8 +16,9 @@ let mainWindow
 let tray
 let localIp
 
+var platform = require('os').platform()
+
 function createTray() {
-  var platform = require('os').platform()
   var trayImage
 
   if (platform == 'win32') {
@@ -53,6 +54,10 @@ function createTray() {
     else {
       mainWindow.close()
       mainWindow = null;
+      // Hide from dock again
+      if(platform == 'darwin') {
+        app.dock.hide()
+      }
     }
   })
 
@@ -101,6 +106,10 @@ function createTray() {
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 400, height: 600})
+  // Show the app in the dock now
+  if(platform == 'darwin') {
+    app.dock.show()
+  }
 
   // and load the index.html of the app.
   mainWindow.loadURL(`file://${__dirname}/index.html`)
@@ -126,6 +135,10 @@ ipc.on('load-info', _ => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', function () {
+  // Hide from dock on MacOS
+  if(platform == 'darwin') {
+    app.dock.hide()
+  }
   createTray()
 })
 
